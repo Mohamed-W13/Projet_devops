@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13
+    container_name: strapi-pg
+    restart: always
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: safepassword
+      POSTGRES_DB: strapi_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  strapi:
+    build: ./my-strapi-app
+    container_name: strapi-app
+    restart: always
+    environment:
+      NODE_ENV: development
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi_db
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: safepassword
+      DATABASE_SCHEMA: public
+    depends_on:
+      - db
+    ports:
+      - "1337:1337"
+    networks:
+      - backend
+
+  react:
+    build: ./my-app
+    container_name: react-frontend
+    restart: always
+    environment:
+      VITE_API_URL: http://localhost:1337
+    depends_on:
+      - strapi
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
