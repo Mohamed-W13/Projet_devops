@@ -1,0 +1,138 @@
+/* src/App.css */
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #1e1e2f;
+  color: white;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.product-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading, .error, .no-products {
+  text-align: center;
+  padding: 40px;
+  color: #9a9a9a;
+  font-size: 18px;
+  width: 100%;
+}
+
+.error {
+  color: #ff5252;
+}
+/* Add to your App.css file */
+.api-debug {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #2a2a40;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.api-debug h3 {
+  margin-top: 0;
+  color: #aaa;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #aaa;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  background-color: #1e1e2f;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 4px;
+}
+
+.api-debug button {
+  padding: 8px 16px;
+  background-color: #4a5aef;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.api-debug button:hover {
+  background-color: #3a4adf;
+}
+
+.api-debug button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.error-message {
+  padding: 10px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border-left: 3px solid #ff5252;
+  color: #ff5252;
+  margin: 10px 0;
+}
+
+.results {
+  margin-top: 20px;
+  background-color: #1e1e2f;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.results h4 {
+  margin-top: 0;
+  color: #aaa;
+}
+
+.results pre {
+  overflow: auto;
+  background-color: #181825;
+  padding: 10px;
+  border-radius: 4px;
+  color: #ddd;
+}
+
+.debug-toggle, .debug-button {
+  padding: 6px 12px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.debug-toggle:hover, .debug-button:hover {
+  background-color: #555;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
