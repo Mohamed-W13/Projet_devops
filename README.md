@@ -1,9 +1,137 @@
 ## Auteurs
 
-- Étudiant 1 : Cheriet Mohamed-Wassim
-- Étudiant 2 : NOM Prénom (Numéro étudiant)
+lien github : https://github.com/Mohamed-W13/Projet_devops ( repository actuellement public )
 
-# Projet OPSCI — Partie 1
+LIEN VIDEO PARTIE 1 : https://youtu.be/pDVDrupz--U
+LIEN VIDEO PARTIE 2 : https://youtu.be/ghDl6wmbtnI
+
+- Étudiant 1 : Cheriet Mohamed-Wassim 21105974
+- Étudiant 2 : Randriamanantena Lucas 28603779
+
+# Projet OPSCI — Partie 1 : Infrastructure de base (Strapi, PostgreSQL, Frontend React)
+
+## Objectif
+
+Mettre en place une plateforme de gestion de produits composée de trois composants principaux :
+
+- Un CMS ( Content Managment System) Strapi pour gérer les produits
+- Une base de données PostgreSQL
+- Un frontend React connecté à l'API Strapi
+
+## Services inclus dans le docker-compose
+
+| Service     | Rôle                           | Port exposé |
+|-------------|--------------------------------|-------------|
+| strapi      | CMS pour la gestion des produits | 1337        |
+| postgres    | Base de données relationnelle     | 5432        |
+| react       | Interface utilisateur (frontend)  | 3000        |
+
+## Étapes de mise en œuvre
+
+### 1. PostgreSQL
+
+Lancement de la base PostgreSQL via Docker :
+
+```bash
+docker run -dit -p 5432:5432 \
+  -e POSTGRES_PASSWORD=safepassword \
+  -e POSTGRES_USER=strapi \
+  --name strapi-pg postgres
+```
+
+Cette base est utilisée par Strapi pour stocker les collections.
+
+### 2. Strapi
+
+Création du projet Strapi :
+
+```bash
+yarn create strapi-app my-strapi-app
+```
+
+Choisir le mode avancé et configurer avec PostgreSQL. Une fois créé, un `Dockerfile` peut être ajouté pour containeriser l'application.
+
+Configuration dans `.env` ou `docker-compose.yml` :
+
+```
+DATABASE_CLIENT=postgres
+DATABASE_HOST=db
+DATABASE_PORT=5432
+DATABASE_NAME=strapi_db
+DATABASE_USERNAME=strapi
+DATABASE_PASSWORD=safepassword
+```
+
+### 3. Modèle de collection `product` dans Strapi
+
+La collection doit contenir :
+
+| Champ           | Type        |
+|------------------|-------------|
+| name            | short text  |
+| description     | long text   |
+| stock_available | integer     |
+| image           | media (image) |
+| barcode         | short text  |
+
+> Attention : la création correcte de cette collection est essentielle pour éviter des erreurs dans le frontend.
+
+### 4. Frontend React
+
+Clone du projet frontend :
+
+```bash
+git clone https://github.com/arthurescriou/opsci-strapi-frontend.git
+cd opsci-strapi-frontend
+npm install
+```
+
+Configurer le fichier `.env` :
+
+```
+REACT_APP_STRAPI_API_URL=http://localhost:1337
+REACT_APP_API_TOKEN=<VOTRE_TOKEN_STRAPI>
+```
+
+Ce token peut être généré depuis l'interface administrateur Strapi : `http://localhost:1337/admin`
+
+### 5. Composants React fournis
+
+Deux composants clés sont utilisés :
+
+- `ProductCard.js` : composant affichant un produit
+- `ApiDebug.js` : utilitaire de test d'appel API
+
+Ces composants se trouvent dans `src/components/`.
+
+### 6. Lancement des services
+
+```bash
+docker-compose up --build -d
+```
+
+Vérification des conteneurs :
+
+```bash
+docker ps
+```
+
+
+
+## Structure du projet
+
+```
+projet_devops/
+├── my-strapi-app/            # Projet CMS
+├── my-app/                   # Frontend React
+│   └── src/components/
+│       ├── ApiDebug.js
+│       └── ProductCard.js
+├── docker-compose.yml
+└── README.md
+```
+
+
 
 
 
@@ -111,4 +239,3 @@ projet_devops/
 ├── docker-compose.yml
 └── README.md
 ```
-
