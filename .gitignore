@@ -1,0 +1,7 @@
+my-app
+kafka/event-consumer/
+kafka/event-producer/
+kafka/product-consumer/
+kafka/product-producer/
+kafka/stock-consumer/
+kafka/stock-producer/
