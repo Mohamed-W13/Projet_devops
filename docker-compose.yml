@@ -16,10 +16,47 @@ services:
     networks:
       - backend
 
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "22181:2181"  # Change the host port to something like 22181
+    expose:
+      - '2181'
+    networks:
+      - backend
+
+  kafka:
+    image: wurstmeister/kafka:2.11-1.1.1
+    container_name: kafka
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG_DIRS: /kafka/logs
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+    networks:
+      - backend
+
+
+
   strapi:
     build: ./my-strapi-app
     container_name: strapi-app
     restart: always
+    env_file: 
+      - .env
     environment:
       NODE_ENV: development
       DATABASE_CLIENT: postgres
@@ -29,6 +66,9 @@ services:
       DATABASE_USERNAME: strapi
       DATABASE_PASSWORD: safepassword
       DATABASE_SCHEMA: public
+      APP_KEYS: key1,key2,key3,key4 
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
     depends_on:
       - db
     ports:
@@ -46,6 +86,86 @@ services:
       - strapi
     ports:
       - "3000:3000"
+    networks:
+      - backend
+
+  event-consumer:
+    build:
+      context: ./kafka/event-consumer
+      dockerfile: Dockerfile
+    container_name: event-consumer
+    depends_on:
+      - kafka
+    environment:
+      BROKER: kafka:9093
+      STRAPI_TOKEN: e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9
+    networks:
+      - backend
+
+  event-producer:
+    build:
+      context: ./kafka/event-producer
+      dockerfile: Dockerfile
+    container_name: event-producer
+    depends_on:
+      - kafka
+    environment:
+      BROKER: kafka:9093
+      STRAPI_TOKEN: e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9
+    networks:
+      - backend
+
+  product-consumer:
+    build:
+      context: ./kafka/product-consumer
+      dockerfile: Dockerfile
+    container_name: product-consumer
+    depends_on:
+      - kafka
+    environment:
+      BROKER: kafka:9093
+      STRAPI_TOKEN: e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9
+    networks:
+      - backend
+
+  product-producer:
+    build:
+      context: ./kafka/product-producer
+      dockerfile: Dockerfile
+    container_name: product-producer
+    depends_on:
+      - kafka
+    environment:
+      BROKER: kafka:9093
+      STRAPI_TOKEN: e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9
+    networks:
+      - backend
+
+  stock-consumer:
+    build:
+      context: ./kafka/stock-consumer
+      dockerfile: Dockerfile
+    container_name: stock-consumer
+    depends_on:
+      - kafka
+    environment:
+      - BROKER=kafka:9093
+      - STRAPI_URL=http://strapi:1337
+      - STRAPI_TOKEN=2d2746bef508cce6b990bc58d4d3fa69716be8548a5b51690d1edd3e5887f18830e4acc0b2d763f90763a3bfc1ce699a324872ecdbba97938b56bc280d6de4ebe8a91ba199ba91d4eccb16f8a32628b6254e75fd74dd3e3257df697123599119c518f9ba8e7c7b5d566ba4cf3bac92a1020b38e5286800917e109e97d1dc0072
+      - TOPIC=stock
+    networks:
+      - backend
+
+  stock-producer:
+    build:
+      context: ./kafka/stock-producer
+      dockerfile: Dockerfile
+    container_name: stock-producer
+    depends_on:
+      - kafka
+    environment:
+      BROKER: kafka:9093
+      STRAPI_TOKEN: e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9
     networks:
       - backend
 
