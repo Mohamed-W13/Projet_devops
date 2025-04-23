@@ -287,12 +287,20 @@ Vérification :
 ```bash
 docker ps
 ```
-Simulation mqtt-publish.js :
+Simulation d'un object connecté (abonné) :
 
 ```
 node mqtt-publish.js
 ```
+Verification dans le connecteur MQTT -> Kafka :
+```
+docker logs mqtt-kafka-connector -f
 
+```
+Verification Kafka -> Strapi:
+```
+docker logs product-consumer -f
+```
 Verification des produits existants : 
 ```
 curl -H "Authorization: Bearer TOKEN" http://localhost:1337/api/products
