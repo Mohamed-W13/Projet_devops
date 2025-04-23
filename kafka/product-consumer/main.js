@@ -10,7 +10,7 @@ const ERROR_TOPIC = process.env.ERROR_TOPIC || 'errors';
 const STRAPI_URL = process.env.STRAPI_URL || 'http://strapi:1337';
 
 // Token hardcoded (pour test uniquement)
-const STRAPI_TOKEN ='e079b7941374b48c662636432577b96aa05d99cc68b4750b76e6590bb644e9bb4b8a4c7e5f3273f3873762ec45deb8e779f0d0130e941d6e694c9d7fe3404f505da20ba9b1d4ef425bd5af69418c1fa7d2c165f4a45079a2ecbff5fa796fb81a057e563e25a94519676d68af4a81c71677e9fb0ef218456bff803ddbeb44d5a9'
+const STRAPI_TOKEN ='58cb5bf72c2a03b3d313ced1a1353f834797cdd5b7d8a0a2fe2512385be290e5038e1ad1748be8c12fed275c036a13b36e25b91fda2ad97f907e1f1c1a435e98a41e507fe110baeb396b8e1bb51ae8dc59fd1e887489509639a81dc0645261bb7de4faf1be6ed02d139a12222531f00debd1faebf7838435e8d50b9ed5ad81a9'
 
 console.log(new Date().toISOString(), BROKER_1, BROKER_2, BROKER_3);
 
@@ -27,27 +27,44 @@ const log = (...args) => console.log(new Date().toISOString(), ...args);
 async function sendToStrapi(product) {
   try {
     log('🟢 Nouveau produit reçu :', product);
+    
+    if (product.stockAvailable !== undefined) {
+      product.stock_available = product.stockAvailable;
+      delete product.stockAvailable;
+    }
 
-    const requestBody = { data: product };
-    const endpoint = `${STRAPI_URL}/api/products`;
+    if (product.stockAvailable !== undefined) {
+      product.stock_available = product.stockAvailable;
+      delete product.stockAvailable;
+    }
+
+    const endpoint = `${STRAPI_URL}/api/products/${product.id}`;
+
 
     log('🔍 Request details:');
     log('URL:', endpoint);
-    log('Method: POST');
+    log('Method: PUT');
     log('Headers:', {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${STRAPI_TOKEN.substring(0, 20)}...`
     });
+    const requestBody = {
+      data: {
+        stock_available: product.stock_available,
+      },
+    };
+    
     log('Body:', JSON.stringify(requestBody, null, 2));
-
+    
     const response = await fetch(endpoint, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${STRAPI_TOKEN}`,
       },
       body: JSON.stringify(requestBody),
     });
+    
 
     const responseText = await response.text();
     log('📦 Strapi response:', response.status, responseText);
