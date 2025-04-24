@@ -189,9 +189,9 @@ services:
       - kafka
       - mosquitto
     environment:
-      BROKER_1: kafka:9092
-      BROKER_2: kafka:9092
-      BROKER_3: kafka:9092
+      BROKER_1: kafka:9093
+      BROKER_2: kafka:9093
+      BROKER_3: kafka:9093
       KAFKA_TOPIC: stock
       MQTT_TOPIC: topic
       MQTT_ENDPOINT: ws://mqtt-broker:9001
