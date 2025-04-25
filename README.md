@@ -219,8 +219,6 @@ Vérifiez que tous les services sont bien lancés :
 docker ps
 ```
 
-
-
 ## Tests
 
 - Test de création de produit via product-producer
@@ -232,14 +230,14 @@ docker ps
 ## Objectif
 
 Intégrer un système de communication pour objets connectés (IoT) via **MQTT**, en connectant les messages MQTT à Kafka, puis à Strapi. Cette chaîne permet de :
-- Recevoir des messages IoT (température, statut, etc.) via MQTT
+- Recevoir des messages IoT via MQTT
 - Les transmettre automatiquement à Kafka via un connecteur MQTT-Kafka
 - Les intégrer dans Strapi grâce à un consumer Kafka
 
 ## Architecture MQTT → Kafka → Strapi
 
 ```
-[Capteur IoT] → [Mosquitto (MQTT broker)] → [MQTT-Kafka Connector] → [Kafka topic] → [Kafka Consumer] → [Strapi]
+[Mosquitto (MQTT broker)] → [MQTT-Kafka Connector] → [Kafka topic] → [Kafka Consumer] → [Strapi]
 ```
 
 ## Services supplémentaires
@@ -248,33 +246,6 @@ Intégrer un système de communication pour objets connectés (IoT) via **MQTT**
 |--------------------------|----------------------------------------------|-------------|
 | mosquitto                | Broker MQTT pour les objets connectés        | 1883        |
 | mqtt-kafka-connector     | Relie MQTT à Kafka                           | -           |
-| iot-consumer             | Consumer Kafka qui envoie les données à Strapi | -         |
-
-## Topics Kafka utilisés
-
-- `iot-data` : messages envoyés par les objets connectés (e.g. capteurs)
-- `error` : gestion des erreurs (optionnel)
-
-## Configuration MQTT-Kafka Connector
-
-Fichier `connect-mqtt.properties` :
-
-```
-name=mqtt-connector
-connector.class=io.confluent.connect.mqtt.MqttSourceConnector
-tasks.max=1
-mqtt.server.uri=tcp://mosquitto:1883
-mqtt.topics=iot-data
-kafka.topic=iot-data
-value.converter=org.apache.kafka.connect.converters.ByteArrayConverter
-```
-
-## Exemple de message MQTT publié
-
-```
-Topic: iot-data
-Payload: {"deviceId": "capteur-1", "temp": 23.5, "timestamp": "2025-04-24T12:00:00Z"}
-```
 
 ## Lancement de l'ensemble de l’infrastructure
 
@@ -282,7 +253,7 @@ Payload: {"deviceId": "capteur-1", "temp": 23.5, "timestamp": "2025-04-24T12:00:
 docker-compose up --build -d
 ```
 
-Vérification :
+Vérification des conteneurs docker:
 
 ```bash
 docker ps
@@ -320,11 +291,18 @@ projet_devops/
 │   └── topics.sh
 ├── my-strapi-app/
 ├── my-app/ (frontend React)
+      ├── public/
+      ├── src/
+      ├── .gitignore
+      ├── Dockerfile
+      ├── package.json
+      ├── package-lock.json
+      └── README.md
 ├── docker-compose.yml
-└── README.md
-├── mqtt-kafka-connector/           
-│   └── connect-mqtt.properties
-├── kafka/
-│   ├── iot-consumer/              
+└── README.md          
 ├── mosquitto/
+    └── config/
+        └── mosquitto.conf/
+    └── data/
+    └── log/
 ```
